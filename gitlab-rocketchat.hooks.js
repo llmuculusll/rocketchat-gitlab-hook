@@ -151,25 +151,17 @@ class Script { // eslint-disable-line
 			user_action = 'updated';
 		}
 
-		if (data.assignee) {
-			assigned = `*Assigned to*: @${data.assignee.username}\n`;
+		if (data.assignees) {
+			assigned = `*Assigned to*: @${Object.keys(data.assignees).map(function(k){return data.assignees[k]['username']}).join(",@")}\n`;
 		}
 
+		message = `User ${data.user.name} \n ${user_action} an issue _${data.object_attributes.title}_ on ${project.name}. \n\n *Description:* ${data.object_attributes.description}. \n${assigned}\n
+See: ${data.object_attributes.url} \n ${time}`
 		return {
 			content: {
 				username: 'gitlab/' + project.name,
 				icon_url: USE_ROCKETCHAT_AVATAR ? null : project_avatar,
-				text: (data.assignee && data.assignee.name !== data.user.name) ? atName(data.assignee) : '',
-				attachments: [
-					makeAttachment(
-						data.user,
-						`${user_action} an issue _${data.object_attributes.title}_ on ${project.name}.
-*Description:* ${data.object_attributes.description}.
-${assigned}
-See: ${data.object_attributes.url}`,
-						time
-					)
-				]
+				text: message, 
 			}
 		};
 	}
